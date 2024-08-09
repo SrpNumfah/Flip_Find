@@ -8,10 +8,28 @@ public class GameManager : MonoBehaviour
     [SerializeField] private List<Button> buttonList = new List<Button>();
     [SerializeField] private Sprite backgroungCardImage;
 
+    [Header("Image_Matching")]
+    [SerializeField] private Sprite[] matchingCardImages;
+    [SerializeField] private List<Sprite> matchingImages = new List<Sprite>();
+
+    //cache
+    private int countSelect;
+    private int countCorrectSelect;
+    private int gameSelect;
+    private int firstSelectIndex, secondSelectIndex;
+    private string firstSelectImage, secondSelectnameImage;
+    private bool firstSelect, secondSelect;
+
+    private void Awake()
+    {
+        matchingCardImages = Resources.LoadAll<Sprite>("Sprite/Animal_1");
+    }
+
     private void Start()
     {
         GetButtons();
         AddListeners();
+        AddImageMatching();
     }
 
     #region Private
@@ -50,6 +68,22 @@ public class GameManager : MonoBehaviour
         foreach (Button button in buttonList)
         {
             button.onClick.AddListener(() => PickAcard());
+        }
+    }
+
+    private void AddImageMatching()
+    {
+        int loop = buttonList.Count;
+        int index = 0;
+
+        for (int i = 0; i < loop; i++)
+        {
+            if (index == loop / 2)
+            {
+                index = 0;
+            }
+            matchingImages.Add(matchingCardImages[index]);
+            index++;
         }
     }
     #endregion

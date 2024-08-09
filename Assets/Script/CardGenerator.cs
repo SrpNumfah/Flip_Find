@@ -6,22 +6,23 @@ namespace Card.UI
     {
         [SerializeField] private RectTransform cardField;
         [SerializeField] private GameObject cardButtonPrefabs;
+       
 
-        private void Start()
+        private void Awake()
         {
-            int[,] cardLayout = new int[,]
+            int[,] cardLayouts = new int[,] 
             {
                 {2,2},
                 {3,3},
-                {5,6}
+                {4,4},
+                {5,6},
             };
 
-            int randomCardLayoutIndex = Random.Range(0,cardLayout.GetLength(0));
-            int randomCardLayoutRows = cardLayout[randomCardLayoutIndex, 0];
-            int randomCardLayoutColumns = cardLayout[randomCardLayoutIndex, 1];
+            int randomIndex = Random.Range(0, cardLayouts.GetLength(0));
+            int rows = cardLayouts[randomIndex, 0];
+            int columns = cardLayouts[randomIndex, 1];
 
-            Debug.Log(randomCardLayoutIndex.ToString());
-            GenerateCard(randomCardLayoutRows, randomCardLayoutColumns);
+            GenerateCard(rows, columns);
         }
         #region Private
         private void GenerateCard(int rows, int columns)
@@ -30,9 +31,13 @@ namespace Card.UI
             {
                 Destroy(card.gameObject);
             }
+            
 
             float cardWidth = cardField.rect.width / columns;
             float cardHeight = cardField.rect.height / rows;
+
+            float cardPositionX = -(cardField.rect.width / 2 - cardWidth / 2);
+            float cardPositionY = cardField.rect.height / 2 - cardHeight / 2;
 
             for (int row = 0; row < rows; row++)
             {
@@ -43,7 +48,9 @@ namespace Card.UI
 
                     newCardRect.sizeDelta = new Vector2(cardWidth, cardHeight);
 
-                    newCardRect.anchoredPosition = new Vector2((column - columns / 2f + 0.5f) * cardHeight, (row - rows / 2f + 0.5f) * cardWidth);
+                    float cardSortX = (cardPositionX + column) * cardWidth;
+                    float cardSortY = (cardPositionY - row) * cardHeight;
+                    newCardRect.anchoredPosition = new Vector2(cardSortX,cardSortY);
                 }
             }
 

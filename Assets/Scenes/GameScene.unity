@@ -445,6 +445,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 485a19cebb7e78649a96fbf5198634f7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  buttonList: []
+  backgroungCardImage: {fileID: 21300000, guid: 24d79fd363db2a047a7f110f19aab022, type: 3}
 --- !u!1 &1604970185
 GameObject:
   m_ObjectHideFlags: 0

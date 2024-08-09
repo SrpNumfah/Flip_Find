@@ -44,6 +44,7 @@ namespace Card.UI
                 for (int column = 0; column < columns; column++)
                 {
                     GameObject newCard = Instantiate(cardButtonPrefabs, cardField);
+                    newCard.name =  column + "" + row;
                     RectTransform newCardRect = newCard.GetComponent<RectTransform>();
 
                     newCardRect.sizeDelta = new Vector2(cardWidth, cardHeight);

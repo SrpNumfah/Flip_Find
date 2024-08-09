@@ -17,7 +17,7 @@ public class GameManager : MonoBehaviour
     private int countCorrectSelect;
     private int gameSelect;
     private int firstSelectIndex, secondSelectIndex;
-    private string firstSelectImage, secondSelectnameImage;
+    private string firstSelectname, secondSelectname;
     private bool firstSelect, secondSelect;
 
     private void Awake()
@@ -59,8 +59,29 @@ public class GameManager : MonoBehaviour
 
     private void PickAcard()
     {
-        string currentButton = UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name;
-        Debug.Log(currentButton);
+        if (!firstSelect)
+        {
+            firstSelect = true;
+            firstSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+            firstSelectname = matchingImages[firstSelectIndex].name;
+            buttonList[firstSelectIndex].image.sprite = matchingImages[firstSelectIndex];
+
+
+        } else if (!secondSelect)
+        {
+            secondSelect = true;
+            secondSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+            secondSelectname = matchingImages[secondSelectIndex].name;
+            buttonList[secondSelectIndex].image.sprite = matchingImages[secondSelectIndex];
+
+            if (firstSelectname == secondSelectname)
+            {
+                Debug.Log("Matching!!");
+            } else if (firstSelectname != secondSelectname)
+            {
+                Debug.Log("unmatching!!");
+            }
+        }
     }
 
     private void AddListeners()

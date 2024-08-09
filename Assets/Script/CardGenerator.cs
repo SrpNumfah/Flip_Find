@@ -39,12 +39,14 @@ namespace Card.UI
             float cardPositionX = -(cardField.rect.width / 2 - cardWidth / 2);
             float cardPositionY = cardField.rect.height / 2 - cardHeight / 2;
 
+            int counter = 0;
             for (int row = 0; row < rows; row++)
             {
                 for (int column = 0; column < columns; column++)
                 {
                     GameObject newCard = Instantiate(cardButtonPrefabs, cardField);
-                    newCard.name =  column + "" + row;
+                    newCard.name = "" + counter;
+                    counter++;
                     RectTransform newCardRect = newCard.GetComponent<RectTransform>();
 
                     newCardRect.sizeDelta = new Vector2(cardWidth, cardHeight);

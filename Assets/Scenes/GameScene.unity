@@ -418,6 +418,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardField: {fileID: 1848913171}
   cardButtonPrefabs: {fileID: 6370464375045382519, guid: 8becd76b9a7560b499a7dedc07dd82e6, type: 3}
+  flipCard: {fileID: 8277727628387625642, guid: 8becd76b9a7560b499a7dedc07dd82e6, type: 3}
 --- !u!4 &1473567669
 Transform:
   m_ObjectHideFlags: 0

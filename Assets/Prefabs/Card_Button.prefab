@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8041303807692140648}
   - component: {fileID: 7989460605134781597}
   - component: {fileID: 622872178431638718}
+  - component: {fileID: 8277727628387625642}
   m_Layer: 5
   m_Name: Card_Button
   m_TagString: Cards
@@ -121,3 +122,23 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!95 &8277727628387625642
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6370464375045382519}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 84df517d30b9ee148984cb934f8bb2a4, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0

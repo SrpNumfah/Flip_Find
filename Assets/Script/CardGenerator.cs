@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 
 namespace Card.UI
 {
@@ -6,10 +7,25 @@ namespace Card.UI
     {
         [SerializeField] private RectTransform cardField;
         [SerializeField] private GameObject cardButtonPrefabs;
-       
+
+        public static CardGenerator instance;
+
+        //cache
+        private float flipcardDuration = 1;
 
         private void Awake()
         {
+            
+            if (instance == null)
+            {
+                instance = this;
+                DontDestroyOnLoad(gameObject);
+            } else if (instance != null)
+            {
+                Destroy(gameObject);
+            }
+
+
             int[,] cardLayouts = new int[,] 
             {
                 {2,2},
@@ -24,6 +40,15 @@ namespace Card.UI
 
             GenerateCard(rows, columns);
         }
+
+        #region Public
+        public void PlayFlipAnimation()
+        {
+            StartCoroutine(FlipDurationTime());
+        }
+        #endregion
+
+
         #region Private
         private void GenerateCard(int rows, int columns)
         {
@@ -57,6 +82,24 @@ namespace Card.UI
                 }
             }
 
+        }
+
+        private IEnumerator FlipDurationTime()
+        {
+            Quaternion startRotaion = cardButtonPrefabs.transform.rotation;
+            Quaternion endRotation = Quaternion.Euler(0,180,0);
+
+            float time = 0;
+
+            if (time < flipcardDuration)
+            {
+                cardButtonPrefabs.transform.rotation = Quaternion.Slerp(startRotaion,endRotation, time / flipcardDuration);
+                time += flipcardDuration;
+                yield return null;
+            }
+
+            cardButtonPrefabs.transform.rotation = endRotation;
+       
         }
         #endregion
     }

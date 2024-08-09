@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Random = UnityEngine.Random;
+using Card.UI;
 
 namespace Card.GameManager
 {
@@ -42,7 +43,7 @@ namespace Card.GameManager
             AddImageMatching();
             gameSelect = matchingImages.Count / 2;
 
-            scoreText.text = "Matching" + ":";
+            scoreText.text = "Matching" + ":" + countCorrectSelect;
         }
 
         #region Private
@@ -97,6 +98,7 @@ namespace Card.GameManager
         {
             if (!firstSelect)
             {
+                CardGenerator.instance.PlayFlipAnimation();
                 firstSelect = true;
                 firstSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
                 firstSelectname = matchingImages[firstSelectIndex].name;
@@ -106,6 +108,7 @@ namespace Card.GameManager
             }
             else if (!secondSelect)
             {
+                CardGenerator.instance.PlayFlipAnimation();
                 secondSelect = true;
                 secondSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
                 secondSelectname = matchingImages[secondSelectIndex].name;
@@ -118,11 +121,9 @@ namespace Card.GameManager
         }
         private void CheckIftheGameIsFinished()
         {
-           // countCorrectSelect++;
-
             if (countCorrectSelect == gameSelect)
             {
-                Debug.Log("Game Finished");
+                
             }
         }
 
@@ -153,11 +154,11 @@ namespace Card.GameManager
 
                 yield return new WaitForSeconds(0.5f);
                 CheckIftheGameIsFinished();
+                yield return new WaitForSeconds(0.5f);
 
             }
             else if (firstSelectname != secondSelectname)
             {
-
                 buttonList[firstSelectIndex].image.sprite = backgroungCardImage;
                 buttonList[secondSelectIndex].image.sprite = backgroungCardImage;
             }

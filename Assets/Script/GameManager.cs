@@ -1,111 +1,172 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using Random = UnityEngine.Random;
 
-public class GameManager : MonoBehaviour
+namespace Card.GameManager
 {
-    [Header("Card")]
-    [SerializeField] private List<Button> buttonList = new List<Button>();
-    [SerializeField] private Sprite backgroungCardImage;
-
-    [Header("Image_Matching")]
-    [SerializeField] private Sprite[] matchingCardImages;
-    [SerializeField] private List<Sprite> matchingImages = new List<Sprite>();
-
-    //cache
-    private int countSelect;
-    private int countCorrectSelect;
-    private int gameSelect;
-    private int firstSelectIndex, secondSelectIndex;
-    private string firstSelectname, secondSelectname;
-    private bool firstSelect, secondSelect;
-
-    private void Awake()
+    public class GameManager : MonoBehaviour
     {
-        matchingCardImages = Resources.LoadAll<Sprite>("Sprite/Animal_1");
-    }
+        [Header("Card")]
+        [SerializeField] private List<Button> buttonList = new List<Button>();
+        [SerializeField] private Sprite backgroungCardImage;
 
-    private void Start()
-    {
-        GetButtons();
-        AddListeners();
-        AddImageMatching();
-    }
+        [Header("Image_Matching")]
+        [SerializeField] private Sprite[] matchingCardImages;
+        [SerializeField] private List<Sprite> matchingImages = new List<Sprite>();
 
-    #region Private
-    private void GetButtons()
-    {
-        GameObject[] cardButton = GameObject.FindGameObjectsWithTag("Cards");
+        [Header("UI")]
+        [SerializeField] private TMP_Text scoreText;
 
-        if (cardButton.Length == 0) return;
-       
-        buttonList.Clear();
+        //cache
+        private int countSelect;
+        private int countCorrectSelect = 0;
+        private int gameSelect;
+        private int firstSelectIndex, secondSelectIndex;
+        private string firstSelectname, secondSelectname;
+        private bool firstSelect, secondSelect;
 
-        foreach (GameObject card in cardButton)
+        private void Awake()
         {
-            Button button = card.GetComponent<Button>();
+            matchingCardImages = Resources.LoadAll<Sprite>("Sprite/Animal_1");
+        }
 
-            if (button != null)
+        private void Start()
+        {
+            GetButtons();
+            AddListeners();
+            Shuffle(matchingImages);
+            AddImageMatching();
+            gameSelect = matchingImages.Count / 2;
+
+            scoreText.text = "Matching" + ":";
+        }
+
+        #region Private
+        private void GetButtons()
+        {
+            GameObject[] cardButton = GameObject.FindGameObjectsWithTag("Cards");
+
+            if (cardButton.Length == 0) return;
+
+            buttonList.Clear();
+
+            foreach (GameObject card in cardButton)
             {
-                buttonList.Add(button);
-                button.image.sprite = backgroungCardImage;
-            } 
-            else if (button == null)
-            {
-                Debug.Log("Doesn't have any button");
+                Button button = card.GetComponent<Button>();
+
+                if (button != null)
+                {
+                    buttonList.Add(button);
+                    button.image.sprite = backgroungCardImage;
+                }
+                else if (button == null)
+                {
+                    Debug.Log("Doesn't have any button");
+                }
             }
         }
-    }
 
-    private void PickAcard()
-    {
-        if (!firstSelect)
+        private void AddListeners()
         {
-            firstSelect = true;
-            firstSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
-            firstSelectname = matchingImages[firstSelectIndex].name;
-            buttonList[firstSelectIndex].image.sprite = matchingImages[firstSelectIndex];
+            foreach (Button button in buttonList)
+            {
+                button.onClick.AddListener(() => PickAcard());
+            }
+        }
 
-
-        } else if (!secondSelect)
+        private void AddImageMatching()
         {
-            secondSelect = true;
-            secondSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
-            secondSelectname = matchingImages[secondSelectIndex].name;
-            buttonList[secondSelectIndex].image.sprite = matchingImages[secondSelectIndex];
+            int loop = buttonList.Count;
+            int index = 0;
 
+            for (int i = 0; i < loop; i++)
+            {
+                if (index == loop / 2)
+                {
+                    index = 0;
+                }
+                matchingImages.Add(matchingCardImages[index]);
+                index++;
+            }
+        }
+        private void PickAcard()
+        {
+            if (!firstSelect)
+            {
+                firstSelect = true;
+                firstSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+                firstSelectname = matchingImages[firstSelectIndex].name;
+                buttonList[firstSelectIndex].image.sprite = matchingImages[firstSelectIndex];
+
+
+            }
+            else if (!secondSelect)
+            {
+                secondSelect = true;
+                secondSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+                secondSelectname = matchingImages[secondSelectIndex].name;
+                buttonList[secondSelectIndex].image.sprite = matchingImages[secondSelectIndex];
+
+                countSelect++;
+                StartCoroutine(CheckeIfMatching());
+
+            }
+        }
+        private void CheckIftheGameIsFinished()
+        {
+           // countCorrectSelect++;
+
+            if (countCorrectSelect == gameSelect)
+            {
+                Debug.Log("Game Finished");
+            }
+        }
+
+        private void Shuffle(List<Sprite> spriteList)
+        {
+            for (int i = 0; i < spriteList.Count; i++)
+            {
+                Sprite tempSprite = spriteList[i];
+                int randomIndex = Random.Range(0, spriteList.Count);
+                spriteList[i] = spriteList[randomIndex];
+                spriteList[randomIndex] = tempSprite;
+            }
+        }
+
+        private IEnumerator CheckeIfMatching()
+        {
+            yield return new WaitForSeconds(0.5f);
             if (firstSelectname == secondSelectname)
             {
-                Debug.Log("Matching!!");
-            } else if (firstSelectname != secondSelectname)
-            {
-                Debug.Log("unmatching!!");
+                buttonList[firstSelectIndex].interactable = false;
+                buttonList[secondSelectIndex].interactable = false;
+
+                buttonList[firstSelectIndex].image.color = new Color(0, 0, 0, 0);
+                buttonList[secondSelectIndex].image.color = new Color(0, 0, 0, 0);
+
+                countCorrectSelect++;
+                scoreText.text = "Matching" + ":" + countCorrectSelect;
+
+                yield return new WaitForSeconds(0.5f);
+                CheckIftheGameIsFinished();
+
             }
-        }
-    }
-
-    private void AddListeners()
-    {
-        foreach (Button button in buttonList)
-        {
-            button.onClick.AddListener(() => PickAcard());
-        }
-    }
-
-    private void AddImageMatching()
-    {
-        int loop = buttonList.Count;
-        int index = 0;
-
-        for (int i = 0; i < loop; i++)
-        {
-            if (index == loop / 2)
+            else if (firstSelectname != secondSelectname)
             {
-                index = 0;
+
+                buttonList[firstSelectIndex].image.sprite = backgroungCardImage;
+                buttonList[secondSelectIndex].image.sprite = backgroungCardImage;
             }
-            matchingImages.Add(matchingCardImages[index]);
-            index++;
+
+            firstSelect = secondSelect = false;
         }
+
+
+        #endregion
     }
-    #endregion
+
 }

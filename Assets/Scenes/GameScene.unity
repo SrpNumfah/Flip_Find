@@ -297,7 +297,7 @@ Canvas:
   m_GameObject: {fileID: 613469929}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
+  m_RenderMode: 1
   m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -447,6 +447,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   buttonList: []
   backgroungCardImage: {fileID: 21300000, guid: 24d79fd363db2a047a7f110f19aab022, type: 3}
+  matchingCardImages: []
+  matchingImages: []
+  scoreText: {fileID: 1711976714}
 --- !u!1 &1604970185
 GameObject:
   m_ObjectHideFlags: 0

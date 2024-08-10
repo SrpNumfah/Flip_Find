@@ -21,7 +21,8 @@ namespace Card.GameManager
         [SerializeField, TabGroup("Image_Matching")] private List<Sprite> matchingImages = new List<Sprite>();
 
         [SerializeField, TabGroup("UI")] private TMP_Text scoreText;
-        [SerializeField, TabGroup("UI")] private TMP_Text heighScore;
+        [SerializeField, TabGroup("UI")] private TMP_Text heighScoreText;
+        [SerializeField, TabGroup("UI")] private TMP_Text countTurnText;
 
         //cache
         private int rows;
@@ -113,6 +114,7 @@ namespace Card.GameManager
                 buttonList[secondSelectIndex].image.sprite = matchingImages[secondSelectIndex];
 
                 countSelect++;
+                countTurnText.text = "Turns" + ":" + countSelect;
                 StartCoroutine(CheckeIfMatching());
 
             }
@@ -129,7 +131,7 @@ namespace Card.GameManager
         private void UpdateDisPlay()
         {
             int setCurrenScore = PlayerPrefs.GetInt(CurrentScore);
-            heighScore.text = "Heigh score " + ":" + setCurrenScore;
+            heighScoreText.text = "Heigh score " + ":" + setCurrenScore;
         }
 
         private void Shuffle(List<Sprite> spriteList)
@@ -154,6 +156,8 @@ namespace Card.GameManager
             UpdateDisPlay();
             gameSelect = matchingImages.Count / 2;
             scoreText.text = "Matching" + ":" + countCorrectSelect;
+            countSelect = 0;
+            countTurnText.text = "Turns" + ":" + countSelect;
         }
 
         private IEnumerator CheckeIfMatching()
@@ -169,7 +173,7 @@ namespace Card.GameManager
 
                 countCorrectSelect++;
                 scoreText.text = "Matching" + ":" + countCorrectSelect;
-                PlayerPrefs.SetInt(CurrentScore, countSelect);
+                PlayerPrefs.SetInt(CurrentScore, countCorrectSelect);
 
                 yield return new WaitForSeconds(0.5f);
                 CheckIftheGameIsFinished();

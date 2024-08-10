@@ -16,15 +16,25 @@ namespace Card.GameManager
         [SerializeField, TabGroup("Card Button")] private List<Button> buttonList = new List<Button>();
         [SerializeField, TabGroup("Card Button")] private Sprite backgroungCardImage;
         [SerializeField, TabGroup("Card Button")] private Button restartButton;
+        [SerializeField, TabGroup("Card Button")] private Button exitButton;
 
-        [SerializeField , TabGroup("Image_Matching")] private Sprite[] matchingCardImages;
+        [SerializeField, TabGroup("Image_Matching")] private Sprite[] matchingCardImages;
         [SerializeField, TabGroup("Image_Matching")] private List<Sprite> matchingImages = new List<Sprite>();
 
         [SerializeField, TabGroup("UI")] private TMP_Text scoreText;
         [SerializeField, TabGroup("UI")] private TMP_Text heighScoreText;
         [SerializeField, TabGroup("UI")] private TMP_Text countTurnText;
+        [SerializeField, TabGroup("UI")] private Slider timeSlider;
+        [SerializeField, TabGroup("UI")] private GameObject gameOver;
+
+        [SerializeField, TabGroup("Sound")] private AudioSource correctSound;
+        [SerializeField, TabGroup("Sound")] private AudioSource wrongSound;
+        [SerializeField, TabGroup("Sound")] private AudioSource gameOverSound;
+
+
 
         //cache
+        private float time = 15;
         private int rows;
         private int columns;
         private int countSelect;
@@ -43,7 +53,10 @@ namespace Card.GameManager
         private void Start()
         {
             OnResetNewCards();
+            StartCoroutine(StartCountDown());
+            gameSelect = matchingImages.Count / 2;
         }
+
 
         #region Private
         private void GetButtons()
@@ -70,7 +83,7 @@ namespace Card.GameManager
             }
         }
 
-        
+
 
         private void AddListeners()
         {
@@ -85,7 +98,9 @@ namespace Card.GameManager
             int loop = buttonList.Count;
             int index = 0;
 
-            for (int i = 0; i < loop; i++)
+            if (buttonList.Count == 0) return;
+
+            foreach (Button button in buttonList)
             {
                 if (index == loop / 2)
                 {
@@ -94,6 +109,7 @@ namespace Card.GameManager
                 matchingImages.Add(matchingCardImages[index]);
                 index++;
             }
+            Shuffle(matchingImages);
         }
         private void PickAcard()
         {
@@ -121,7 +137,7 @@ namespace Card.GameManager
         }
         private void CheckIftheGameIsFinished()
         {
-            if (countCorrectSelect == gameSelect )
+            if (countCorrectSelect == gameSelect)
             {
                 gameSelect = 0;
                 StartCoroutine(RestartGame());
@@ -148,13 +164,10 @@ namespace Card.GameManager
         private void OnResetNewCards()
         {
             matchingCardImages = Resources.LoadAll<Sprite>("Sprite/Animal_1");
-            buttonList.Clear();
             GetButtons();
-            Shuffle(matchingImages);
             AddImageMatching();
             AddListeners();
             UpdateDisPlay();
-            gameSelect = matchingImages.Count / 2;
             scoreText.text = "Matching" + ":" + countCorrectSelect;
             countSelect = 0;
             countTurnText.text = "Turns" + ":" + countSelect;
@@ -165,11 +178,13 @@ namespace Card.GameManager
             yield return new WaitForSeconds(0.5f);
             if (firstSelectname == secondSelectname)
             {
-                buttonList[firstSelectIndex].interactable = false;
-                buttonList[secondSelectIndex].interactable = false;
-
+                correctSound.Play();
                 buttonList[firstSelectIndex].image.color = new Color(0, 0, 0, 0);
                 buttonList[secondSelectIndex].image.color = new Color(0, 0, 0, 0);
+
+               
+                buttonList[firstSelectIndex].interactable = false;
+                buttonList[secondSelectIndex].interactable = false;
 
                 countCorrectSelect++;
                 scoreText.text = "Matching" + ":" + countCorrectSelect;
@@ -181,6 +196,7 @@ namespace Card.GameManager
             }
             else if (firstSelectname != secondSelectname)
             {
+                wrongSound.Play();
                 buttonList[firstSelectIndex].image.sprite = backgroungCardImage;
                 buttonList[secondSelectIndex].image.sprite = backgroungCardImage;
             }
@@ -188,15 +204,47 @@ namespace Card.GameManager
             firstSelect = secondSelect = false;
         }
 
-        private  IEnumerator  RestartGame()
+        private IEnumerator RestartGame()
         {
             yield return new WaitForSeconds(0.1f);
             rows = CardGenerator.instance.OnSetRows();
             columns = CardGenerator.instance.OnSetColumns();
-            CardGenerator.instance.GenerateCard(rows,columns);
+            CardGenerator.instance.GenerateCard(rows, columns);
+            
             yield return new WaitForSeconds(0.1f);
             OnResetNewCards();
+
         }
+
+        private IEnumerator StartCountDown()
+        {
+            float currentTime = time;
+            timeSlider.maxValue = currentTime; 
+
+            while (currentTime > 0)
+            {
+                timeSlider.value = currentTime;
+                yield return new WaitForSeconds(1f);
+                currentTime--;
+            }
+            timeSlider.value = 0;
+            OnTimeUp();
+        }
+
+        private void OnTimeUp()
+        {
+            gameOver.SetActive(true);
+            gameOverSound.Play();
+            exitButton.onClick.AddListener(() => Exit());
+            Debug.Log("Game over");
+        }
+
+        private void Exit()
+        {
+            Application.Quit();
+        }
+
+
         #endregion
     }
 

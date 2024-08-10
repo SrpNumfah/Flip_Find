@@ -13,6 +13,8 @@ namespace Card.UI
         [SerializeField, TabGroup("Card Genarator")] private RectTransform cardField;
         [SerializeField, TabGroup("Card Genarator")] private GameObject cardButtonPrefabs;
 
+        [SerializeField, TabGroup("Sound")] private AudioSource flipSound;
+
 
         //cache
         private float flipcardDuration = 1;
@@ -35,7 +37,6 @@ namespace Card.UI
             int[,] cardLayouts = new int[,] 
             {
                 {2,2},
-                {3,3},
                 {4,4},
                 {5,6},
             };
@@ -54,10 +55,10 @@ namespace Card.UI
         public int OnSetColumns() => setColumns;
         public void GenerateCard(int rows, int columns)
         {
-            foreach (Transform card in cardField)
-            {
-                Destroy(card.gameObject);
-            }
+           foreach (Transform card in cardField)
+           {
+               Destroy(card.gameObject);
+           }
 
 
             float cardWidth = cardField.rect.width / columns;
@@ -87,6 +88,7 @@ namespace Card.UI
         }
         public void PlayFlipAnimation()
         {
+            flipSound.Play();
             StartCoroutine(FlipDurationTime());
         }
 

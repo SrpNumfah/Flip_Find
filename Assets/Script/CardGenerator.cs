@@ -1,17 +1,23 @@
 using UnityEngine;
 using System.Collections;
+using Sirenix.OdinInspector;
 
 namespace Card.UI
 {
     public class CardGenerator : MonoBehaviour
     {
-        [SerializeField] private RectTransform cardField;
-        [SerializeField] private GameObject cardButtonPrefabs;
-
+        #region Singleton
         public static CardGenerator instance;
+        #endregion
+
+        [SerializeField, TabGroup("Card Genarator")] private RectTransform cardField;
+        [SerializeField, TabGroup("Card Genarator")] private GameObject cardButtonPrefabs;
+
 
         //cache
         private float flipcardDuration = 1;
+        private int setRows;
+        private int setColumns;
 
         private void Awake()
         {
@@ -38,25 +44,21 @@ namespace Card.UI
             int rows = cardLayouts[randomIndex, 0];
             int columns = cardLayouts[randomIndex, 1];
 
-            GenerateCard(rows, columns);
+            setRows = rows;
+            setColumns = columns;
+            GenerateCard(setRows, setColumns);
         }
 
         #region Public
-        public void PlayFlipAnimation()
-        {
-            StartCoroutine(FlipDurationTime());
-        }
-        #endregion
-
-
-        #region Private
-        private void GenerateCard(int rows, int columns)
+        public int OnSetRows() => setRows;
+        public int OnSetColumns() => setColumns;
+        public void GenerateCard(int rows, int columns)
         {
             foreach (Transform card in cardField)
             {
                 Destroy(card.gameObject);
             }
-            
+
 
             float cardWidth = cardField.rect.width / columns;
             float cardHeight = cardField.rect.height / rows;
@@ -78,29 +80,38 @@ namespace Card.UI
 
                     float cardSortX = (cardPositionX + column) * cardWidth;
                     float cardSortY = (cardPositionY - row) * cardHeight;
-                    newCardRect.anchoredPosition = new Vector2(cardSortX,cardSortY);
+                    newCardRect.anchoredPosition = new Vector2(cardSortX, cardSortY);
                 }
             }
 
         }
+        public void PlayFlipAnimation()
+        {
+            StartCoroutine(FlipDurationTime());
+        }
 
+        #endregion
+
+
+        #region Private
         private IEnumerator FlipDurationTime()
         {
             Quaternion startRotaion = cardButtonPrefabs.transform.rotation;
-            Quaternion endRotation = Quaternion.Euler(0,180,0);
+            Quaternion endRotation = Quaternion.Euler(0, 180, 0);
 
             float time = 0;
 
             if (time < flipcardDuration)
             {
-                cardButtonPrefabs.transform.rotation = Quaternion.Slerp(startRotaion,endRotation, time / flipcardDuration);
+                cardButtonPrefabs.transform.rotation = Quaternion.Slerp(startRotaion, endRotation, time / flipcardDuration);
                 time += flipcardDuration;
                 yield return null;
             }
 
             cardButtonPrefabs.transform.rotation = endRotation;
-       
+
         }
+
         #endregion
     }
 }

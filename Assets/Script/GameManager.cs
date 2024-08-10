@@ -6,29 +6,33 @@ using UnityEngine.UI;
 using TMPro;
 using Random = UnityEngine.Random;
 using Card.UI;
+using Sirenix.OdinInspector;
+
 
 namespace Card.GameManager
 {
     public class GameManager : MonoBehaviour
     {
-        [Header("Card")]
-        [SerializeField] private List<Button> buttonList = new List<Button>();
-        [SerializeField] private Sprite backgroungCardImage;
+        [SerializeField, TabGroup("Card Button")] private List<Button> buttonList = new List<Button>();
+        [SerializeField, TabGroup("Card Button")] private Sprite backgroungCardImage;
+        [SerializeField, TabGroup("Card Button")] private Button restartButton;
 
-        [Header("Image_Matching")]
-        [SerializeField] private Sprite[] matchingCardImages;
-        [SerializeField] private List<Sprite> matchingImages = new List<Sprite>();
+        [SerializeField , TabGroup("Image_Matching")] private Sprite[] matchingCardImages;
+        [SerializeField, TabGroup("Image_Matching")] private List<Sprite> matchingImages = new List<Sprite>();
 
-        [Header("UI")]
-        [SerializeField] private TMP_Text scoreText;
+        [SerializeField, TabGroup("UI")] private TMP_Text scoreText;
+        [SerializeField, TabGroup("UI")] private TMP_Text heighScore;
 
         //cache
+        private int rows;
+        private int columns;
         private int countSelect;
         private int countCorrectSelect = 0;
         private int gameSelect;
         private int firstSelectIndex, secondSelectIndex;
         private string firstSelectname, secondSelectname;
         private bool firstSelect, secondSelect;
+        private const string CurrentScore = "currentScore";
 
         private void Awake()
         {
@@ -37,13 +41,7 @@ namespace Card.GameManager
 
         private void Start()
         {
-            GetButtons();
-            AddListeners();
-            Shuffle(matchingImages);
-            AddImageMatching();
-            gameSelect = matchingImages.Count / 2;
-
-            scoreText.text = "Matching" + ":" + countCorrectSelect;
+            OnResetNewCards();
         }
 
         #region Private
@@ -70,6 +68,8 @@ namespace Card.GameManager
                 }
             }
         }
+
+        
 
         private void AddListeners()
         {
@@ -103,8 +103,6 @@ namespace Card.GameManager
                 firstSelectIndex = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
                 firstSelectname = matchingImages[firstSelectIndex].name;
                 buttonList[firstSelectIndex].image.sprite = matchingImages[firstSelectIndex];
-
-
             }
             else if (!secondSelect)
             {
@@ -121,10 +119,17 @@ namespace Card.GameManager
         }
         private void CheckIftheGameIsFinished()
         {
-            if (countCorrectSelect == gameSelect)
+            if (countCorrectSelect == gameSelect )
             {
-                
+                gameSelect = 0;
+                StartCoroutine(RestartGame());
             }
+        }
+
+        private void UpdateDisPlay()
+        {
+            int setCurrenScore = PlayerPrefs.GetInt(CurrentScore);
+            heighScore.text = "Heigh score " + ":" + setCurrenScore;
         }
 
         private void Shuffle(List<Sprite> spriteList)
@@ -136,6 +141,19 @@ namespace Card.GameManager
                 spriteList[i] = spriteList[randomIndex];
                 spriteList[randomIndex] = tempSprite;
             }
+        }
+
+        private void OnResetNewCards()
+        {
+            matchingCardImages = Resources.LoadAll<Sprite>("Sprite/Animal_1");
+            buttonList.Clear();
+            GetButtons();
+            Shuffle(matchingImages);
+            AddImageMatching();
+            AddListeners();
+            UpdateDisPlay();
+            gameSelect = matchingImages.Count / 2;
+            scoreText.text = "Matching" + ":" + countCorrectSelect;
         }
 
         private IEnumerator CheckeIfMatching()
@@ -151,10 +169,10 @@ namespace Card.GameManager
 
                 countCorrectSelect++;
                 scoreText.text = "Matching" + ":" + countCorrectSelect;
+                PlayerPrefs.SetInt(CurrentScore, countSelect);
 
                 yield return new WaitForSeconds(0.5f);
                 CheckIftheGameIsFinished();
-                yield return new WaitForSeconds(0.5f);
 
             }
             else if (firstSelectname != secondSelectname)
@@ -166,7 +184,15 @@ namespace Card.GameManager
             firstSelect = secondSelect = false;
         }
 
-
+        private  IEnumerator  RestartGame()
+        {
+            yield return new WaitForSeconds(0.1f);
+            rows = CardGenerator.instance.OnSetRows();
+            columns = CardGenerator.instance.OnSetColumns();
+            CardGenerator.instance.GenerateCard(rows,columns);
+            yield return new WaitForSeconds(0.1f);
+            OnResetNewCards();
+        }
         #endregion
     }
 
